@@ -1,0 +1,91 @@
+---
+title: a look at tree-based machine learning
+author: Vincent Carey
+date: 2026-11-01
+---
+
+# Background
+
+We have the MNIST data consisting of digitized images of handwritten arabic numerals.
+
+```{r lkdat}
+data("mnist", package="glmmlpack260")
+str(mnist)
+mt8ind = which(mnist$train$labels==8)
+imgs8 = mnist$train$images[mt8ind,]
+par(mfrow=c(2,2),mar=c(4,3,2,2))
+for (i in 1:4) image(matrix(imgs8[i,], 28)[,28:1])
+```
+
+Each image has 784 = 28 x 28 intensity values from 0 to 255.  R's
+`image` function can help us recognize the variability in
+handwritten numerals.
+
+That computers can perform handwriting recognition is well-established.
+How do they do it?  We will examine steps towards an answer.
+
+# Feature exploration
+
+The images present a "human readable" view of the data.  One
+"feature" of interest is the pattern of intensity along a line 
+in the "middle" of the image.
+
+```{r lktra}
+par(mfrow=c(2,2),mar=c(4,3,2,2))
+for (i in 1:4) {
+   image(matrix(imgs8[i,], 28)[,28:1])
+   abline(v=.5)
+}
+```
+
+We can extract the data values corresponding to this
+"middle" line and plot the intensities.
+
+```{r lktra2}
+par(mfrow=c(2,2),mar=c(4,3,2,2))
+for (i in 1:4) {
+   plot(matrix(imgs8[i,], 28)[,28:1][14,]) # why?
+}
+```
+
+The intent here is to identify the "column" of the image
+matrix that exhibits three peaks of intensity.
+
+It turns out that the 15th "column" of the image matrix
+will exhibit the three peaks characteristic of a vertical
+scan of the handwritten "8".  We need the indices into
+the 784-column matrix of thousands of numerals that have
+been scanned.
+
+```{r lklineinds}
+lineinds = which(((matrix(0:783 %% 28, 28))+1)==15) 
+imgs8[1:4, lineinds]
+```
+
+We propose the 28 features identified in this way as sufficient
+to identify an "8".  Surely we can do better, but let's see
+if this is a useful setp.
+
+# Exercise 1.
+
+Produce four images for the numeral 1.
+
+```{r lk1}
+mt1ind = which(mnist$train$labels==1)
+imgs1 = mnist$train$images[mt1ind,]
+par(mfrow=c(2,2),mar=c(4,3,2,2))
+for (i in 1:4) image(matrix(imgs1[i,], 28)[,28:1])
+```
+ 
+Build a tree-structured classifier.
+
+```{r lktr}
+newdat = data.frame(num="8", imgs8[, lineinds])
+newdat = rbind(newdat, data.frame(num="1", imgs1[, lineinds]))
+newdat$num = factor(newdat$num)
+library(rpart)
+t1 = rpart(num~., data=newdat)
+t1
+plot(t1)
+text(t1)
+```

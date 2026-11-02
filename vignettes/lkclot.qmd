@@ -1,0 +1,14 @@
+---
+title: modeling clotting time data
+author: Vincent Carey
+date: 2026-11-01
+---
+
+# Background
+
+We have the clotting data set in glmmlpack260.
+
+```{r lkdat}
+data("clotting", package="glmmlpack260")
+with(clotting, plot(clottime~pfpconc, col=factor(lot), pch=19))
+```
