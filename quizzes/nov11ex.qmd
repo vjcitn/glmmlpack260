@@ -1,0 +1,53 @@
+---
+title: "Exercises for BST260 2026, November 9 2026"
+---
+
+1. Add a folder called quizzes to your bst260 github
+repository.
+
+2. Start a quarto document called `nov9.qmd` there.
+
+3. Put your solutions to these problems in that document.
+Make sure it renders.
+
+Problem 1. Consider
+
+```{r do1,message=FALSE}
+library(ggplot2)
+library(tidyr)
+library(ggbeeswarm)
+ggplot(pivot_longer(iris, cols=1:4), 
+   aes(x=factor(name), y=value, colour=Species)) + geom_beeswarm()
+```
+Find thresholds on values of Petal.Length that can be used to classify
+samples into species.  For example, the vector `cutsl` here
+defines bins into which irises can be classified using Sepal.Length.
+We can then cross-classify the species labels and the
+three sepal-length based categories.
+```{r lkdisc}
+cutsl = c(0,5.4,6,8)
+with(iris, table(cut(Sepal.Length,cutsl),Species))
+```
+Your job is to pick an iris feature and thresholds
+on length that reduce the numbers of off-diagonal elements
+of this table, which represents a "confusion matrix'.
+
+Your answer will have the form
+```
+feature = "..."
+cutsl = c(....)
+with(iris, table(cut( ..., cutsl), Species))
+```
+
+Problem 2.
+
+This is a crude way of estimating proportion of births
+with low birth weight outcomes as it varies by mother's body weight.
+```{r lklbw,message=FALSE}
+library(MASS)
+lm(low~I(cut(lwt,seq(0,300,50)))-1, data=birthwt)
+```
+
+Fit a two parameter model with `lm` that provides
+an estimate of the proportion of births with
+low birth weight outcome for women with body weight 150.
